@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>DENISIA Launcher | ULTIMATE EMPIRE EDITION</title>
+    <style>
+        /* === FULL DENISIA GRAPHICS === */
+        * { box-sizing: border-box; -webkit-user-select: none; user-select: none; cursor: crosshair; transform: translateZ(0); }
+        body, html { margin: 0; padding: 0; width: 100%; height: 100%; background: #000; color: #00BFFF; font-family: 'Arial Black', sans-serif; overflow: hidden; touch-action: none; }
+        
+        #universe-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle at center, #001a33 0%, #000 85%); z-index: -10; }
+        .star { position: absolute; background: #00BFFF; border-radius: 50%; animation: twinkle var(--d) infinite ease-in-out; }
+        @keyframes twinkle { 0%, 100% { opacity: 0.3; transform: scale(1); } 50% { opacity: 0.8; transform: scale(1.3); } }
+        
+        .obj { position: fixed; z-index: -2; pointer-events: none; }
+        .ball-3d { width: 80px; height: 80px; border-radius: 50%; animation: bounce 3s ease-in-out infinite; }
+        .blue-ball { background: radial-gradient(circle at 30px 30px, #00BFFF, #000); left: 15%; top: 10%; box-shadow: 0 20px 40px rgba(0, 191, 255, 0.5); }
+        .green-ball { background: radial-gradient(circle at 30px 30px, #00FF00, #000); right: 15%; top: 70%; animation-delay: 1.5s; box-shadow: 0 20px 40px rgba(0, 255, 0, 0.4); }
+        @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-300px); } }
+        
+        .ufo { font-size: 60px; animation: flyLR 12s linear infinite; top: 20%; }
+        .rocket { font-size: 50px; animation: flyDiagonal 7s linear infinite; }
+        .unicorn { font-size: 55px; animation: flyRL 10s linear infinite; top: 40%; }
+        @keyframes flyLR { from { left: -150px; } to { left: 110vw; } }
+        @keyframes flyRL { from { right: -150px; } to { right: 110vw; } }
+        @keyframes flyDiagonal { from { transform: translate(-10vw, 100vh) rotate(45deg); } to { transform: translate(110vw, -10vh) rotate(45deg); } }
+
+        /* === LOGIN & PAYMENT SCREEN === */
+        #auth-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; display: flex; align-items: center; justify-content: center; z-index: 9999; }
+        .auth-container { display: flex; width: 95%; max-width: 1200px; height: 80vh; gap: 20px; }
+        .video-box { flex: 1.5; border: 4px solid #00BFFF; box-shadow: 0 0 50px #00BFFF; background: #000; }
+        .login-box { flex: 1; display: flex; flex-direction: column; justify-content: center; text-align: center; background: rgba(0,0,0,0.85); padding: 30px; border: 2px solid #00BFFF; backdrop-filter: blur(15px); }
+        
+        .logo { font-size: 70px; text-shadow: 0 0 30px #00BFFF; margin: 0; }
+        .tagline { letter-spacing: 10px; font-size: 18px; color: #fff; margin-bottom: 20px; }
+        .price-tag { color: #00FF00; font-size: 30px; margin-bottom: 20px; text-shadow: 0 0 10px #00FF00; }
+
+        .btn-pay { display: block; background: #00BFFF; color: #000; padding: 25px; font-size: 24px; font-weight: bold; margin: 10px 0; transition: 0.3s; border: none; cursor: pointer; width: 100%; }
+        .btn-pay:hover { transform: scale(1.05); box-shadow: 0 0 40px #00BFFF; background: #fff; }
+
+        /* === QR MODAL === */
+        #qr-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.98); z-index: 100000; align-items: center; justify-content: center; flex-direction: column; text-align: center; }
+        .qr-card { background: #fff; padding: 20px; border-radius: 15px; margin: 20px; box-shadow: 0 0 50px #fff; }
+        #status-log { color: #FFD700; font-family: monospace; font-size: 16px; margin-top: 20px; text-shadow: 0 0 5px #000; }
+
+        /* === MAIN LAUNCHER MENU === */
+        #main-launcher { display: none; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; width: 100%; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; width: 90%; max-width: 1000px; z-index: 10; margin-top: 40px; }
+        .game-btn { background: rgba(0, 0, 0, 0.85); border: 3px solid #00BFFF; color: #00BFFF; padding: 25px; text-align: center; font-size: 16px; font-weight: bold; transition: 0.3s; cursor: pointer; backdrop-filter: blur(10px); }
+        .game-btn:hover { background: #00BFFF; color: #000; box-shadow: 0 0 40px #00BFFF; transform: scale(1.1); }
+
+        /* === GAME VIEW === */
+        #game-view { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 1000000; }
+        #game-frame { width: 100%; height: 100%; border: none; }
+        .close-game { position: absolute; top: 25px; right: 25px; background: #ff0000; color: #fff; padding: 15px 35px; font-weight: bold; border: 2px solid #fff; cursor: pointer; z-index: 1000001; }
+
+        .trail { position: fixed; width: 10px; height: 10px; background: #00BFFF; border-radius: 50%; pointer-events: none; z-index: 10000; animation: fade 0.6s forwards; }
+        @keyframes fade { 0% { opacity: 1; } 100% { opacity: 0; transform: scale(4); } }
+    </style>
+</head>
+<body oncontextmenu="return false;">
+
+    <div id="universe-bg"></div>
+
+    <div class="obj ball-3d blue-ball"></div>
+    <div class="obj ball-3d green-ball"></div> 
+    <div class="obj ufo">🛸</div>
+    <div class="obj rocket">🚀</div>
+    <div class="obj unicorn">🦄</div>
+
+    <div id="qr-modal">
+        <h1 style="color:#00BFFF; font-size: 40px;">SCAN TO UNLOCK EMPIRE</h1>
+        <div class="qr-card">
+            <img id="qr-img" src="" alt="QR" style="width:280px; height:280px;">
+        </div>
+        <div style="color:#fff; max-width: 500px; padding: 20px;">
+            <p>1. Scan QR with your phone camera (use Tonkeeper)</p>
+            <p>2. Complete <b>$2500</b> payment (in TON coins)</p>
+            <p id="status-log">AWAITING TRANSACTION...</p>
+            <button class="btn-pay" style="padding:10px; width: 200px;" onclick="closeQr()">BACK</button>
+        </div>
+    </div>
+
+    <div id="game-view">
+        <button class="close-game" onclick="closeGame()">EXIT MISSION</button>
+        <iframe id="game-frame" src=""></iframe>
+    </div>
+
+    <div id="auth-screen">
+        <div class="auth-container">
+            <div class="video-box">
+                <iframe width="100%" height="100%" src="https://www.youtube.com/embed/hnOIV5_egYc?autoplay=1&mute=0&loop=1&playlist=hnOIV5_egYc" frameborder="0" allow="autoplay"></iframe>
+            </div>
+            <div class="login-box">
+                <h1 class="logo">DENISIA</h1>
+                <div class="tagline">LIFETIME ACCESS</div>
+                <div class="price-tag">$2500 FOR ALL PC</div>
+                <button id="payBtn" class="btn-pay" onclick="showQr()">BUY ACCESS</button>
+                <div style="font-size: 12px; color: #555; margin-top: 15px;">
+                    HQ: SINOP | WALLET: UQB0HK...HQ
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="main-launcher">
+        <h1 class="logo" style="font-size: 110px;">DENISIA</h1>
+        <div style="color: #00FF00; letter-spacing: 15px; font-size: 20px; margin-bottom: 20px;">EMPIRE UNLOCKED FOREVER</div>
+
+        <div class="grid">
+            <div onclick="launchGame('https://denis19sl02-sketch.github.io/Funny-Balls-/')" class="game-btn">Funny Balls</div>
+            <div onclick="launchGame('https://denis19sl02-sketch.github.io/Aliens-/')" class="game-btn">Aliens</div>
+            <div onclick="launchGame('https://denis19sl02-sketch.github.io/Saving-The-Titanic/')" class="game-btn">Saving The Titanic</div>
+            <div onclick="launchGame('https://denis19sl02-sketch.github.io/Racing-Horses-/')" class="game-btn">Racing Horses</div>
+            <div onclick="launchGame('https://denis19sl02-sketch.github.io/Zombie-In-Forest-/')" class="game-btn">Dark Woods</div>
+            <div onclick="launchGame('https://denis19sl02-sketch.github.io/Funny-Balls-2/')" class="game-btn">Funny Balls 2</div>
+            <div onclick="launchGame('https://denis19sl02-sketch.github.io/DENISIAGRAM-/')" class="game-btn">DENISIAGRAM</div>
+        </div>
+    </div>
+
+    <script>
+        const WALLET = "UQB0HK2LubFblnzTNWjuchU0CtFjEfFrlRXO23YkwVKaoyHQ";
+        const TON_AMOUNT = 450; // Approx $2500
+        let userIp = "";
+
+        async function init() {
+            try {
+                const res = await fetch('https://api.ipify.org?format=json');
+                const data = await res.json();
+                userIp = data.ip.replace(/\./g, '_');
+                
+                if (localStorage.getItem('den_eternal_' + userIp) === 'true') {
+                    openLauncher();
+                }
+            } catch (e) { console.log("Init Error"); }
+        }
+
+        function showQr() {
+            const qrImg = document.getElementById('qr-img');
+            const payData = `ton://transfer/${WALLET}?amount=${TON_AMOUNT}000000000`;
+            qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=280x280&data=${encodeURIComponent(payData)}`;
+            
+            document.getElementById('qr-modal').style.display = 'flex';
+            startBlockchainCheck();
+        }
+
+        function closeQr() { document.getElementById('qr-modal').style.display = 'none'; }
+
+        async function startBlockchainCheck() {
+            const log = document.getElementById('status-log');
+            log.innerText = "SCANNER ACTIVE: WATCHING BLOCKCHAIN FOR $2500...";
+
+            const checker = setInterval(async () => {
+                try {
+                    const response = await fetch(`https://toncenter.com/api/v2/getTransactions?address=${WALLET}&limit=5`);
+                    const result = await response.json();
+                    
+                    if (result.ok && result.result.length > 0) {
+                        const now = Math.floor(Date.now() / 1000);
+                        const paid = result.result.some(tx => {
+                            return (now - tx.utime) < 1200 && parseInt(tx.in_msg.value) > 0;
+                        });
+
+                        if (paid) {
+                            clearInterval(checker);
+                            localStorage.setItem('den_eternal_' + userIp, 'true');
+                            log.innerHTML = "<b style='color:#00FF00; font-size:24px;'>PAYMENT FOUND! WELCOME!</b>";
+                            setTimeout(openLauncher, 2000);
+                        }
+                    }
+                } catch (e) { log.innerText = "API BUSY... RETRYING SCAN"; }
+            }, 10000);
+        }
+
+        function openLauncher() {
+            document.getElementById('auth-screen').style.display = 'none';
+            document.getElementById('qr-modal').style.display = 'none';
+            document.getElementById('main-launcher').style.display = 'flex';
+        }
+
+        function launchGame(url) {
+            document.getElementById('game-frame').src = url;
+            document.getElementById('game-view').style.display = 'block';
+        }
+
+        function closeGame() {
+            document.getElementById('game-frame').src = "";
+            document.getElementById('game-view').style.display = 'none';
+        }
+
+        // PROTECTION
+        window.addEventListener('keydown', e => {
+            if (e.key === "F12" || (e.ctrlKey && e.shiftKey && e.key === "I") || (e.ctrlKey && e.key === "U")) e.preventDefault();
+        });
+
+        // UNIVERSE
+        const universe = document.getElementById('universe-bg');
+        for (let i = 0; i < 100; i++) {
+            const star = document.createElement('div');
+            star.className = 'star';
+            star.style.width = '2px'; star.style.height = '2px';
+            star.style.left = Math.random() * 100 + '%'; star.style.top = Math.random() * 100 + '%';
+            star.style.setProperty('--d', (Math.random() * 2 + 1) + 's');
+            universe.appendChild(star);
+        }
+
+        document.addEventListener('mousemove', e => {
+            const t = document.createElement('div');
+            t.className = 'trail';
+            t.style.left = e.pageX + 'px'; t.style.top = e.pageY + 'px';
+            document.body.appendChild(t);
+            setTimeout(() => t.remove(), 600);
+        });
+
+        window.onload = init;
+    </script>
+</body>
+</html>
